@@ -1,12 +1,12 @@
 #!/bin/bash
 
+# Function export rows to csv from all relevant tables without headers
+# then delete user from these tables
 function extract_user_from_tables(){
-	database_path=~/.kalite/database/data.sqlite
-	
-	#export rows to csv from all relevant tables without headers
-	#then delete user from these tables
+    # Path to database users are being extracted from
+    database_path=~/.kalite/database/data.sqlite
 
-	#main_userlog
+    # main_userlog
     sqlite3 -csv $database_path "select * from main_userlog where user_id='"$1"';" >> main_userlog.csv
     sqlite3 $database_path "delete from main_userlog where user_id='"$1"';"   
 
@@ -34,10 +34,12 @@ function extract_user_from_tables(){
 # get user input path to file
 #read -p 'Please enter the path to the list of students to be migrated:' learners_to_migrate
 
+# Path to csv file containing user_ids of learners to migrate 
 learners_to_migrate=~/migrants.txt
+
 # if file exists
 if [ -f "$learners_to_migrate" ];then
-  # loop through each id in file and run function on it
+  # loop through each id in file and run extraction function on each user_id
   while IFS='' read -r line || [[ -n "$line" ]]; do  
     extract_user_from_tables $line
   done < $learners_to_migrate
